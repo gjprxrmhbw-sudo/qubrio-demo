@@ -67,19 +67,97 @@ body {
     text-rendering: optimizeLegibility;
 }
 
-/* Inline rich-text utilities */
-em { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 1.04em; letter-spacing: 0.01em; }
-strong { font-weight: 600; color: var(--ink); }
-code, kbd, samp { font-family: var(--mono); font-size: 0.92em; }
+/* ── Inline rich-text utilities ── */
+em {
+    font-style: italic;
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 1.05em;
+    color: #1a3a5c;
+}
+
+strong { font-weight: 600; }
+
+code, kbd, samp { font-family: var(--mono); font-size: 0.9em; }
+
 :not(pre) > code {
     background: var(--bg-alt);
-    padding: 1px 6px;
+    padding: 1px 7px;
     border-radius: 4px;
     color: var(--primary-dark);
     font-weight: 500;
     border: 1px solid var(--border);
+    letter-spacing: -0.01em;
 }
-sub, sup { font-feature-settings: 'subs', 'sups'; }
+
+sub, sup {
+    font-feature-settings: 'subs', 'sups';
+    font-size: 0.78em;
+}
+
+/* ── Contextual <strong> color (matches reference's li/td/figcaption strong) ── */
+.intro-content p strong,
+.intro-content li strong,
+.column-text strong,
+.results-intro strong,
+.abstract-text strong,
+.figure-caption strong,
+.table-caption strong,
+.system-description > p strong { color: var(--primary-dark); }
+
+/* Table strong is GOLD for highlighted values, GREEN for best-row */
+.results-table td strong { color: #b8860b; font-weight: 700; }
+.results-table .best-row td strong { color: var(--green); }
+
+/* ── Rich-text highlight classes (1:1 with reference blog) ── */
+.hl-blue   { color: var(--primary); font-weight: 600; }
+.hl-gold   { color: #b8860b; font-weight: 600; }
+.hl-green  { color: var(--green); font-weight: 600; }
+.hl-red    { color: var(--red); font-weight: 600; }
+.hl-purple { color: #7c3aed; font-weight: 600; }
+
+/* Numbers — mono font + accent color (4.7×, 30.3×, 38% ...) */
+.hl-num {
+    color: var(--primary-dark);
+    font-weight: 700;
+    font-family: var(--mono);
+    font-size: 0.95em;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Italic technical terms — convoy-style shuttling, three-level decomposition */
+.hl-term {
+    color: #7c3aed;
+    font-style: italic;
+}
+
+/* Model / system names — Qubrio, PowerMove, Enola, Qwen-3.5 ... */
+.hl-model {
+    background: rgba(74,58,255,0.08);
+    color: var(--primary-dark);
+    padding: 0.1em 0.45em;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 0.93em;
+}
+
+/* Key result phrases — long callout in prose */
+.hl-result {
+    background: linear-gradient(135deg, rgba(22,163,74,0.12), rgba(22,163,74,0.06));
+    color: #15803d;
+    padding: 0.1em 0.5em;
+    border-radius: 3px;
+    font-weight: 700;
+}
+
+/* Warning / caution highlight */
+.hl-warn {
+    background: #fff3e0;
+    color: #c2410c;
+    padding: 0.1em 0.5em;
+    border-radius: 3px;
+    font-weight: 600;
+}
 
 /* ---- Skip link (keyboard accessibility) ---- */
 .skip-link {

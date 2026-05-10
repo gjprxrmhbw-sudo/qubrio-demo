@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Qubrio: High-Performance Quantum Compilation via Multi-Agent LLM Collaboration</title>
+    <meta
+      name="description"
+      content="Qubrio is an agentic LLM framework for quantum compilation that achieves 4.7× faster hardware runtime and 1.3× higher fidelity than the SOTA neutral atom compiler PowerMove. Submitted to NeurIPS 2026."
+    />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Qubrio: High-Performance Quantum Compilation via Multi-Agent LLM Collaboration" />
+    <meta
+      property="og:description"
+      content="An agentic LLM framework for quantum compilation that achieves 4.7× faster hardware runtime and 1.3× higher fidelity over the SOTA neutral atom compiler PowerMove."
+    />
+    <meta property="og:image" content="assets/intro.png" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Qubrio: High-Performance Quantum Compilation via Multi-Agent LLM Collaboration" />
+    <meta
+      name="twitter:description"
+      content="An agentic LLM framework for quantum compilation. 4.7× faster runtime, 1.3× higher fidelity vs. the SOTA neutral atom compiler."
+    />
+    <meta name="twitter:image" content="assets/intro.png" />
+
+    <!-- Favicon (inline SVG, atom theme) -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop offset='0' stop-color='%23667eea'/%3E%3Cstop offset='1' stop-color='%23764ba2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='30' fill='url(%23g)'/%3E%3Cg fill='none' stroke='white' stroke-width='2.5'%3E%3Cellipse cx='32' cy='32' rx='22' ry='9'/%3E%3Cellipse cx='32' cy='32' rx='22' ry='9' transform='rotate(60 32 32)'/%3E%3Cellipse cx='32' cy='32' rx='22' ry='9' transform='rotate(120 32 32)'/%3E%3C/g%3E%3Ccircle cx='32' cy='32' r='3.5' fill='white'/%3E%3C/svg%3E"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Top Navigation Bar -->
+    <nav class="top-navbar" aria-label="Primary">
+      <div class="container">
+        <div class="nav-items">
+          <a href="#" class="nav-pill active">Qubrio</a>
+          <a
+            href="https://anonymous.4open.science/r/Qubrio-486C"
+            class="nav-pill"
+            target="_blank"
+            rel="noopener"
+            >Code</a
+          >
+          <a href="#results" class="nav-pill">Results</a>
+          <a href="#convoy" class="nav-pill">Convoy</a>
+          <a href="#bibtex" class="nav-pill">Cite</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Table of Contents — Right Sidebar -->
+    <aside class="toc-sidebar" id="tocSidebar" aria-label="Table of contents">
+      <div class="toc-content" id="tocContent">
+        <h3>Table of Contents</h3>
+        <nav aria-label="Section navigation">
+          <a href="#introduction">Introduction</a>
+          <a href="#background">Background</a>
+          <a href="#workflow">Qubrio Framework</a>
+          <a href="#convoy">Convoy-Style Shuttling</a>
+          <a href="#results">Results</a>
+          <a href="#ablation">Ablation</a>
+          <a href="#share">Share</a>
+          <a href="#bibtex">BibTeX</a>
+        </nav>
+      </div>
+    </aside>
+
+    <div class="main-container" id="main-content">
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <div class="container">
+          <!-- Logo and Title -->
+          <div class="hero-header">
+            <div class="logo-title-wrapper">
+              <div class="logo-icon">
+                <i class="fas fa-atom"></i>
+              </div>
+              <h1 class="logo-text">Qubrio</h1>
+            </div>
+            <h2 class="subtitle">
+              High-Performance Quantum Compilation via Multi-Agent LLM
+              Collaboration
+            </h2>
+          </div>
+
+          <!-- Authors (hidden during double-blind review) -->
+          <!--
+          <div class="authors">
+            <p class="author-names">Anonymous Authors<sup>*</sup></p>
+            <p class="affiliations">
+              <sup>*</sup> Submitted to NeurIPS 2026 (under double-blind review)
+            </p>
+          </div>
+          -->
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <a
+              href="https://anonymous.4open.science/r/Qubrio-486C"
+              class="action-btn"
+              target="_blank"
+              rel="noopener"
+            >
+              <i class="fab fa-github"></i> Code
+            </a>
+            <a href="#results" class="action-btn">
+              <i class="fas fa-chart-line"></i> Results
+            </a>
+            <a href="#convoy" class="action-btn">
+              <i class="fas fa-route"></i> Convoy
+            </a>
+          </div>
+
+          <!-- Abstract -->
+          <p class="abstract-text">
+            Large Language Models (LLMs) offer an adaptable alternative to
+            traditional quantum compilation heuristics, which bottleneck
+            progress by demanding costly manual redesigns whenever hardware
+            evolves. We introduce <strong>Qubrio</strong>, a practical agentic
+            framework that significantly reduces heuristic redesigns through a
+            <strong>three-level decomposition</strong>: (1) partitioning
+            programs into sequential operation stages, (2) deploying specialized
+            agents for placement, routing, and optimization, and (3) using
+            disaggregated feedback for precise error correction. Beyond serving
+            as a direct compiler, Qubrio uncovers novel
+            <strong>convoy-style shuttling</strong> strategies, achieving
+            <strong>4.7×</strong> hardware-runtime and <strong>1.3×</strong>
+            fidelity improvements over the SOTA compiler PowerMove on neutral
+            atom hardware.
+          </p>
+
+          <!-- Hero Figure -->
+          <div class="hero-figure">
+            <img
+              src="assets/intro.png"
+              alt="Bar chart showing Qubrio reducing hardware runtime by 4.7× and improving fidelity by 1.3× over PowerMove across QFT, QAOA, GHZ, and Ising benchmarks."
+              fetchpriority="high"
+              decoding="async"
+            />
+            <p class="figure-caption">
+              <strong
+                >Qubrio reduces hardware runtime by 4.7× on average and
+                improves circuit fidelity by 1.3× over the state-of-the-art NA
+                compiler PowerMove,</strong
+              >
+              while seamlessly adapting to new hardware capabilities (parallel
+              AODs, zoned architectures) via simple prompt updates.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Introduction Section -->
+      <section id="introduction" class="content-section">
+        <div class="container">
+          <h2 class="section-title">Introduction</h2>
+          <div class="intro-content">
+            <p>
+              Quantum compilation, the process of translating high-level
+              quantum algorithms into hardware-executable instructions, is a
+              key challenge in enabling practical quantum computation. Existing
+              quantum compilers typically rely on
+              <strong>domain-engineered heuristics</strong> to handle diverse
+              hardware constraints. Adapting to new hardware features often
+              requires domain experts to redesign heuristics and rewrite
+              substantial portions of the compilation pipeline.
+            </p>
+            <p>
+              Against this backdrop, LLMs offer a promising solution. They have
+              demonstrated strong capabilities in program synthesis, code
+              optimization, and reasoning over structured representations,
+              suggesting they can learn compilation logic directly from
+              hardware descriptions. However,
+              <strong>naive single-pass LLM compilation fails in practice</strong>
+              under three orthogonal sources of pressure:
+            </p>
+
+            <ul class="key-points">
+              <li>
+                <strong>Input complexity:</strong> A full quantum program
+                exceeds the regime in which current LLMs reason reliably.
+              </li>
+              <li>
+                <strong>Task heterogeneity:</strong> Compilation couples
+                sub-tasks with distinct reasoning modes (spatial assignment vs.
+                sequential trajectory planning), inducing cross-task
+                interference.
+              </li>
+              <li>
+                <strong>Feedback ambiguity:</strong> Overall performance scores
+                do not localize which constraint was violated nor which step
+                caused the violation.
+              </li>
+            </ul>
+
+            <div class="highlight-box">
+              <p>
+                We address these challenges through a
+                <strong>three-level decomposition</strong> that relieves
+                pressure at each stage of the compilation process: <em>input
+                decomposition</em> partitions the program into manageable
+                stages, <em>task decomposition</em> assigns sub-tasks to
+                specialized agents, and <em>feedback decomposition</em>
+                replaces scalar rewards with structured, multi-dimensional
+                signals.
+              </p>
+            </div>
+
+            <p>
+              Furthermore, our LLM framework uncovers novel strategies that
+              facilitate a highly parallel routing pattern, which we term
+              <strong>'convoy-style shuttling'</strong>. The agent learns to
+              leverage buffer positions and continuous motion to align
+              multiple qubits into synchronized movements, a non-trivial
+              optimization that complements existing domain expertise.
+            </p>
+
+            <h3 class="subsection-title" style="margin-top: 32px">
+              Contributions
+            </h3>
+            <ul class="key-points">
+              <li>
+                <strong>An Adaptable Agentic Compiler Framework</strong> with
+                three-level decomposition that overcomes the failures of
+                single-pass LLMs.
+              </li>
+              <li>
+                <strong>LLM-Driven Heuristic Discovery.</strong> Qubrio
+                uncovers convoy-style shuttling strategies, transferable into
+                classical compilers as standalone heuristics.
+              </li>
+              <li>
+                <strong>SOTA Efficacy and Prompt-Driven Adaptability.</strong>
+                Qubrio outperforms PowerMove with average improvements of 4.7×
+                hardware runtime and 1.3× fidelity, easily adapting to new
+                hardware via prompt updates.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Background Section -->
+      <section id="background" class="content-section bg-light">
+        <div class="container">
+          <h2 class="section-title">Background</h2>
+
+          <div class="figure-container">
+            <img
+              src="assets/background.png"
+              alt="Three-panel diagram: (a) quantum circuit decomposed into sequential CZ stages with single-qubit gates; (b) atoms held in static SLM traps and shuttled by AOD into interaction distance; (c) AOD movement constraints showing that rows and columns cannot cross."
+              class="figure-image"
+              loading="lazy"
+              decoding="async"
+            />
+            <p class="figure-caption">
+              <strong>Figure 1.</strong> Quantum circuit structure and neutral
+              atom hardware. (a) Circuits decompose into sequential stages of
+              parallel CZ interleaved with single-qubit gates. (b) Atoms
+              reside in static SLM and are shuttled into interaction distance
+              for two-qubit gates. (c) Atom movements prohibit row and column
+              crossings, requiring controlled transport velocities to ensure
+              high movement fidelity (F<sub>move</sub>).
+            </p>
+          </div>
+
+          <div class="intro-content">
+            <h3 class="subsection-title">Quantum Compilation Problem</h3>
+            <p>
+              Quantum compilation translates a high-level quantum program into
+              executable operations on a quantum processor. Because hardware
+              limits two-qubit interactions to adjacent positions, an
+              <em>n</em>-qubit circuit is decomposed into a temporal sequence of
+              stages {S<sub>1</sub>, …, S<sub>K</sub>}. Each stage requires
+              solving two coupled optimization tasks:
+              <strong>placement</strong> (mapping logical qubits to physical
+              positions) and <strong>routing</strong> (moving qubits to adjacent
+              positions for two-qubit gate interaction).
+            </p>
+
+            <h3 class="subsection-title">Neutral Atom Quantum Computing</h3>
+            <p>
+              Neutral atom quantum computers (NAQCs) have emerged as one of the
+              leading platforms for scalable quantum computation, offering long
+              coherence times, high-fidelity operations, and flexible
+              reconfigurability. Unlike localized SWAP operations in
+              superconducting and trapped-ion systems, NAQC routing requires
+              <strong>global movement planning</strong> across the entire qubit
+              array, governed by three critical hardware constraints:
+            </p>
+
+            <ul class="key-points">
+              <li>
+                <strong>Topological Ordering:</strong> The AOD grid can stretch
+                or contract, but rows and columns can never cross.
+              </li>
+              <li>
+                <strong>Velocity Bounds:</strong> Shuttling speed must be
+                controlled to prevent atom loss.
+              </li>
+              <li>
+                <strong>Transfer Penalties:</strong> Each SLM–AOD transfer
+                incurs a non-negligible error, forcing a trade-off between
+                minimizing transfers and minimizing routing time.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Qubrio System Section -->
+      <section id="workflow" class="content-section">
+        <div class="container">
+          <h2 class="section-title">
+            <strong>Qubrio</strong>: A Three-Level Decomposition Framework
+          </h2>
+
+          <div class="system-overview">
+            <div class="figure-container">
+              <img
+                src="assets/overview.png"
+                alt="Qubrio multi-agent framework: LLM agents for placement, routing, and optimization (green) interact with deterministic verifiers (red) that enforce constraints, iteratively refining schedules until all constraints are satisfied."
+                class="figure-image"
+                loading="lazy"
+                decoding="async"
+              />
+              <p class="figure-caption">
+                <strong>Figure 2.</strong> Multi-agent framework for quantum
+                compilation. LLM agents (e–g, green) generate placements,
+                routes, and optimizations; deterministic verifiers (b–d, red)
+                enforce constraints and evaluate performance. Agents iteratively
+                refine outputs via structured feedback until all constraints are
+                satisfied, producing a verified, optimized schedule (h).
+              </p>
+            </div>
+
+            <div class="system-description">
+              <h3>Three-Level Decomposition</h3>
+              <p>
+                Qubrio is structured around three complementary forms of
+                decomposition that relieve pressure at each stage of the
+                compilation loop:
+              </p>
+
+              <div class="agent-cards">
+                <div class="agent-card">
+                  <div class="agent-icon">
+                    <i class="fas fa-cubes"></i>
+                  </div>
+                  <h4>Input Decomposition</h4>
+                  <p>
+                    Partitions a quantum program into sequential CZ operation
+                    stages {S<sub>1</sub>, …, S<sub>K</sub>}, so that each
+                    stage fits within the context length over which LLMs
+                    reason reliably.
+                  </p>
+                </div>
+                <div class="agent-card">
+                  <div class="agent-icon">
+                    <i class="fas fa-sitemap"></i>
+                  </div>
+                  <h4>Task Decomposition</h4>
+                  <p>
+                    Assigns sub-tasks to specialized agents (Placement,
+                    Routing, and Optimize), each matched to one reasoning mode,
+                    eliminating cross-task interference.
+                  </p>
+                </div>
+                <div class="agent-card">
+                  <div class="agent-icon">
+                    <i class="fas fa-bullseye"></i>
+                  </div>
+                  <h4>Feedback Decomposition</h4>
+                  <p>
+                    Replaces overall performance scores with structured signals:
+                    verifiers localize constraint violations, and the simulator
+                    decouples fidelity into transfer-penalty and decoherence
+                    components.
+                  </p>
+                </div>
+              </div>
+
+              <h3 style="margin-top: 40px">Specialized Agents</h3>
+              <div class="agent-cards">
+                <div class="agent-card">
+                  <div class="agent-icon">
+                    <i class="fas fa-th"></i>
+                  </div>
+                  <h4>Placement Agent</h4>
+                  <p>
+                    Computes the qubit-to-trap mapping
+                    P<sub>k+1</sub>: Q<sub>k+1</sub> → T for each CZ stage,
+                    ensuring CZ pairs stay within interaction distance r and
+                    non-interacting pairs maintain separation &gt; r to
+                    eliminate crosstalk.
+                  </p>
+                </div>
+                <div class="agent-card">
+                  <div class="agent-icon">
+                    <i class="fas fa-route"></i>
+                  </div>
+                  <h4>Routing Agent</h4>
+                  <p>
+                    Determines a sequence of M discrete AOD operations to
+                    shuttle atoms while respecting non-crossing constraints,
+                    velocity bounds, and minimizing SLM–AOD transfers.
+                  </p>
+                </div>
+                <div class="agent-card">
+                  <div class="agent-icon">
+                    <i class="fas fa-sliders-h"></i>
+                  </div>
+                  <h4>Optimize Agent</h4>
+                  <p>
+                    Iteratively refines the schedule by sampling candidate
+                    modifications and evaluating them against the Hardware
+                    Simulator using outcome–diagnostic feedback decomposition.
+                  </p>
+                </div>
+                <div class="agent-card">
+                  <div class="agent-icon">
+                    <i class="fas fa-shield-alt"></i>
+                  </div>
+                  <h4>Verifiers</h4>
+                  <p>
+                    Deterministic checkers that localize constraint violations:
+                    placement collisions, adjacency errors, crosstalk, AOD
+                    crossings, and trajectory conflicts at specific timesteps.
+                  </p>
+                </div>
+              </div>
+
+              <h3 style="margin-top: 40px">
+                Hierarchical Verification &amp; Feedback
+              </h3>
+              <p>
+                The placement verifier localizes errors into three structured
+                sets: <strong>Collision</strong> (qubits sharing a trap),
+                <strong>Adjacency</strong> (CZ pairs placed too far apart), and
+                <strong>Crosstalk</strong> (non-interacting pairs placed too
+                close). A two-stage reasoning pipeline first establishes a
+                valid topological baseline, then jointly reports adjacency and
+                crosstalk to navigate their opposing spatial pressures.
+              </p>
+              <p>
+                The routing verifier provides
+                <strong>spatio-temporal localization</strong>: every violation
+                is annotated with the offending qubits and the specific step
+                <em>t</em> at which it occurred. This causal signal allows the
+                agent to surgically modify the offending segment while
+                preserving valid portions of the routing sequence.
+              </p>
+
+              <div class="info-box">
+                <h4>Outcome–Diagnostic Optimization</h4>
+                <p>
+                  The Optimize Agent receives a two-layer feedback structure:
+                  the <strong>Outcome Layer</strong> reports hardware runtime
+                  (T<sub>exe</sub>) and fidelity (F), while the
+                  <strong>Diagnostic Layer</strong> decouples F into transfer
+                  penalty and decoherence components. A candidate is accepted
+                  only if it improves at least one of T<sub>exe</sub> or F
+                  without degrading the other.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Convoy-Style Shuttling Section -->
+      <section id="convoy" class="content-section bg-light">
+        <div class="container">
+          <h2 class="section-title">Convoy-Style Shuttling</h2>
+
+          <p class="results-intro">
+            Applying Qubrio, we identify a novel routing pattern that
+            substantially improves hardware schedule efficiency. Unlike
+            previous compilers that route qubits independently along shortest
+            paths, our agent groups qubits with spatially compatible
+            trajectories to displace them in a single, coordinated movement.
+          </p>
+
+          <div class="figure-container">
+            <img
+              src="assets/convoy.png"
+              alt="Convoy routing illustration: (a) placement transition between two CZ stages, (b) scalar baseline routing where qubits move individually, (c) Qubrio's convoy routing where multiple qubits move in lockstep, and (d) movement-concurrency comparison showing up to 30.3 qubits per AOD on GHZ-78."
+              class="figure-image"
+              loading="lazy"
+              decoding="async"
+            />
+            <p class="figure-caption">
+              <strong>Figure 3.</strong> Convoy routing overview. (a) Placement
+              transition between two CZ stages. (b) Scalar routing: qubits are
+              moved individually. (c) Convoy routing: multiple qubits are moved
+              in lockstep, reducing hardware runtime and decoherence. (d)
+              Movement concurrency across benchmarks: Qubrio achieves up to
+              30.3 qubits per AOD on GHZ-78 versus 1.7 for prior compilers.
+            </p>
+          </div>
+
+          <div class="two-column-layout">
+            <div class="column-text">
+              <h3>(1) Strategic Use of Buffer Positions</h3>
+              <p>
+                The agent often utilizes
+                <strong>buffer positions</strong> to perform subtle local
+                adjustments. By intentionally deviating from individual
+                shortest paths, the agent aligns qubits whose movements would
+                otherwise be incompatible, allowing them to form a shared
+                convoy. Since AOD rows and columns move in tandem, this
+                deliberate synchronization effectively converts idle hardware
+                cycles into concurrent movements without introducing crossing
+                or collision violations.
+              </p>
+            </div>
+            <div class="column-text">
+              <h3>(2) Minimizing Transfer Penalties</h3>
+              <p>
+                The agent discovers that maintaining atoms in
+                <strong>continuous motion</strong> across consecutive AOD
+                rounds avoids the penalties associated with repeated SLM–AOD
+                transfers. Effectively, the agent converts the physical
+                fidelity model into a scheduling constraint that favors
+                sustained convoy membership over naive round-by-round
+                re-optimization.
+              </p>
+            </div>
+          </div>
+
+          <div class="highlight-box">
+            <p>
+              <strong>Why is this discovery notable?</strong> (1) The LLM
+              discovers parallelization strategies <em>without</em> explicit
+              heuristic guidance. (2) The strategies are non-trivial, requiring
+              joint reasoning over AOD constraints, transfer penalties, and
+              decoherence. (3) The pattern is directly actionable: buffer
+              utilization and continuous motion can be extracted as standalone
+              heuristics, with our distilled version recovering
+              <strong>38% of the total runtime reduction</strong> when
+              integrated into the PowerMove baseline.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results Section -->
+      <section id="results" class="content-section">
+        <div class="container">
+          <h2 class="section-title">Experimental Results</h2>
+
+          <p class="results-intro">
+            We compare Qubrio against
+            <strong>Enola</strong> and the SOTA NA compiler
+            <strong>PowerMove</strong> on QASMBench programs (QFT, QAOA, GHZ,
+            Ising) with up to ~10⁴ gates. We evaluate three LLM backbones:
+            <strong>Qwen-3.5</strong>, <strong>DeepSeek-V3.2</strong>, and
+            <strong>GPT-5.4</strong>, to assess backbone sensitivity.
+          </p>
+
+          <!-- Stats summary -->
+          <div class="benchmark-stats">
+            <div class="stat-box">
+              <div class="stat-number">4.7×</div>
+              <div class="stat-label">Runtime Reduction</div>
+              <p>Average over PowerMove on NA hardware</p>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number">1.3×</div>
+              <div class="stat-label">Fidelity Gain</div>
+              <p>Across all benchmarks (incl. QFT-63)</p>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number">30.3×</div>
+              <div class="stat-label">Speedup on GHZ-78</div>
+              <p>Vs. Enola at ~60-qubit scale</p>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number">3</div>
+              <div class="stat-label">LLM Backbones</div>
+              <p>Qwen-3.5, DeepSeek-V3.2, GPT-5.4</p>
+            </div>
+          </div>
+
+          <!-- Main comparison figure -->
+          <div class="results-content" style="margin-top: 60px">
+            <h3 class="subsection-title">End-to-End Comparison</h3>
+            <p class="results-intro">
+              Hardware runtime (normalized to Qubrio GPT-5.4) and circuit
+              fidelity (normalized to Enola) across all benchmarks. Qubrio
+              consistently reduces runtime and improves fidelity over Enola and
+              PowerMove for all three LLM backbones.
+            </p>
+            <div class="figure-container">
+              <img
+                src="assets/main_results.png"
+                alt="End-to-end comparison plots: (a) hardware runtime and (b) circuit fidelity for Qubrio (Qwen-3.5, DeepSeek-V3.2, GPT-5.4) versus Enola and PowerMove across all benchmarks. Qubrio consistently achieves lower runtime and higher fidelity."
+                class="figure-image"
+                loading="lazy"
+                decoding="async"
+              />
+              <p class="figure-caption">
+                <strong>Figure 4.</strong> End-to-end comparison of Qubrio
+                against Enola and PowerMove. (a) Hardware runtime, normalized
+                to Qubrio (GPT-5.4). (b) Circuit fidelity, normalized to Enola.
+                On the most challenging QFT-63 circuit, Qubrio recovers
+                fidelity from 10⁻¹⁶ (PowerMove) to 10⁻⁸.
+              </p>
+            </div>
+          </div>
+
+          <!-- Quantitative summary table -->
+          <div class="results-content" style="margin-top: 60px">
+            <h3 class="subsection-title">
+              Quantitative Speedup over Baselines
+            </h3>
+            <p class="results-intro">
+              Average runtime speedup of Qubrio (GPT-5.4) over Enola and
+              PowerMove, broken down by circuit size and structure.
+            </p>
+
+            <div class="results-table-container">
+              <table class="results-table">
+                <thead>
+                  <tr>
+                    <th style="min-width: 200px">Configuration</th>
+                    <th>Speedup vs. Enola</th>
+                    <th>Speedup vs. PowerMove</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>~20-qubit circuits</td>
+                    <td>19.1×</td>
+                    <td>3.8×</td>
+                  </tr>
+                  <tr class="best-row">
+                    <td><strong>~60-qubit circuits</strong></td>
+                    <td><strong>30.3×</strong></td>
+                    <td><strong>5.9×</strong></td>
+                  </tr>
+                  <tr>
+                    <td>Qubrio (DeepSeek-V3.2)</td>
+                    <td>12.7×</td>
+                    <td>2.5×</td>
+                  </tr>
+                  <tr>
+                    <td>Qubrio (Qwen-3.5)</td>
+                    <td>10.4×</td>
+                    <td>2.1×</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="table-caption">
+                <strong>Table 1.</strong> Performance gains are inherent to the
+                agentic architecture and consistent across LLM backbones. The
+                advantage scales with circuit size — Qubrio is particularly
+                effective on larger and more regular circuits.
+              </p>
+            </div>
+          </div>
+
+          <!-- Adaptability section -->
+          <div class="results-content" style="margin-top: 60px">
+            <h3 class="subsection-title">Adaptability to New Hardware</h3>
+            <p class="results-intro">
+              Qubrio adapts to two emerging hardware capabilities (multi-AOD
+              parallelism and zoned architectures) through
+              <strong>simple prompt updates</strong>, with no changes to the
+              underlying compilation logic.
+            </p>
+
+            <div class="figure-container">
+              <img
+                src="assets/ablation_cd.png"
+                alt="Adaptability results: hardware runtime under multi-AOD parallelism (varying k_AOD) and circuit fidelity under zoned architectures across QFT, QAOA, GHZ, and Ising benchmarks, showing consistent improvements with simple prompt updates."
+                class="figure-image"
+                loading="lazy"
+                decoding="async"
+              />
+              <p class="figure-caption">
+                <strong>Figure 6.</strong> Qubrio adapts to new hardware
+                capabilities via prompt updates. Multi-AOD parallelism reduces
+                schedule duration as the AOD budget grows, and a
+                natural-language description of zoned layouts improves fidelity
+                across all benchmarks, with a 2263× improvement on QFT-63.
+              </p>
+            </div>
+
+            <div class="dimensions-grid">
+              <div class="dimension-box">
+                <div class="dim-icon">
+                  <i class="fas fa-layer-group"></i>
+                </div>
+                <h4>Multi-AOD Scenario</h4>
+                <p>
+                  A single additional AOD already yields substantial duration
+                  reductions across all benchmarks, with further gains as
+                  k<sub>AOD</sub> increases. Qubrio updates only the AOD budget
+                  in the prompt; heuristic compilers would require redesigning
+                  the router and rederiving the cost model.
+                </p>
+              </div>
+              <div class="dimension-box">
+                <div class="dim-icon">
+                  <i class="fas fa-th-large"></i>
+                </div>
+                <h4>Zoned Architecture</h4>
+                <p>
+                  By appending a natural-language description of the zone
+                  layout to the prompt, fidelity improves consistently across
+                  all benchmarks, with a notable
+                  <strong>2263× improvement on QFT-63</strong>. The agent
+                  exploits zone partitioning automatically, without explicit
+                  instruction.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Ablation Section -->
+      <section id="ablation" class="content-section bg-light">
+        <div class="container">
+          <h2 class="section-title">Ablation Studies</h2>
+
+          <!-- Ablation: agent design, optimizer, LLM vs. classical -->
+          <div class="results-content">
+            <h3 class="subsection-title">Architectural Ablations</h3>
+            <p class="results-intro">
+              We isolate the contribution of each architectural decision by
+              comparing pipeline configurations, sweeping optimizer turns K,
+              and progressively replacing LLM agents with heuristic PowerMove
+              counterparts.
+            </p>
+            <div class="figure-container">
+              <img
+                src="assets/ablation_ab.png"
+                alt="Ablation results across three panels: (a) comparison of Single-Agent, No-Verifier, merged placement-routing, and full Multi-Agent pipelines on QFT-18 and QAOA-20; (b) optimizer convergence as a function of optimization rounds K; (c) LLM vs. classical modules and the effect of distilling convoy-style shuttling into PowerMove."
+                class="figure-image"
+                loading="lazy"
+                decoding="async"
+              />
+              <p class="figure-caption">
+                <strong>Figure 5.</strong> (a) Ablation of agent design choices.
+                Single-Agent and No-Verifier configurations
+                <strong>fail to produce valid schedules</strong> on QFT-18 and
+                QAOA-20 (shown as "—"), confirming that agent decomposition and
+                verification are complementary. The full Multi-Agent pipeline
+                reduces duration by an average of 1.6× over the merged
+                placement-routing variant. (b) Optimizer convergence: K=5
+                captures the bulk of the improvement; without optimization
+                (K=0), schedules are on average 1.7× longer. (c) Ablation of
+                LLM vs. classical modules. The routing stage benefits more from
+                LLM reasoning than the placement stage, due to the larger
+                combinatorial search space of sequential trajectory planning.
+                <strong
+                  >Distilling convoy-style shuttling into the PowerMove
+                  baseline recovers 38% of the total runtime reduction</strong
+                >, demonstrating practical transferability of LLM-discovered
+                heuristics.
+              </p>
+            </div>
+          </div>
+
+          <!-- Key takeaways -->
+          <div class="results-content" style="margin-top: 60px">
+            <h3 class="subsection-title">Key Findings</h3>
+            <div class="findings-grid">
+              <div class="finding-box success">
+                <div class="finding-icon">
+                  <i class="fas fa-check-circle"></i>
+                </div>
+                <h4>Decomposition is Essential</h4>
+                <p>
+                  Single-agent pipelines fail on circuits as small as QFT-18.
+                  Both stage-wise input decomposition and placement–routing
+                  task decomposition are necessary for reliability.
+                </p>
+              </div>
+              <div class="finding-box success">
+                <div class="finding-icon">
+                  <i class="fas fa-check-circle"></i>
+                </div>
+                <h4>Verifiers are the Critical Glue</h4>
+                <p>
+                  Closed-loop deterministic verification — not just LLM
+                  reasoning — is what makes the pipeline produce valid
+                  schedules. Verifier and decomposition are complementary.
+                </p>
+              </div>
+              <div class="finding-box success">
+                <div class="finding-icon">
+                  <i class="fas fa-check-circle"></i>
+                </div>
+                <h4>Heuristics Transfer Back</h4>
+                <p>
+                  Convoy-style shuttling, distilled into the classical
+                  PowerMove compiler, recovers
+                  <strong>38% of the runtime reduction</strong>, highlighting
+                  Qubrio's value as a heuristic-discovery tool.
+                </p>
+              </div>
+              <div class="finding-box info">
+                <div class="finding-icon">
+                  <i class="fas fa-info-circle"></i>
+                </div>
+                <h4>Backbone Robustness</h4>
+                <p>
+                  Performance gains are consistent across Qwen-3.5,
+                  DeepSeek-V3.2, and GPT-5.4, confirming that improvements
+                  stem from the architecture, not from any specific model's
+                  capabilities.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Share Section -->
+      <section id="share" class="content-section">
+        <div class="container">
+          <h2 class="section-title">Share <strong>Qubrio</strong></h2>
+          <div class="share-buttons">
+            <a
+              id="share-twitter"
+              href="https://twitter.com/intent/tweet?text=Qubrio%3A%20High-Performance%20Quantum%20Compilation%20via%20Multi-Agent%20LLM%20Collaboration&url=https%3A%2F%2Fanonymous.4open.science%2Fr%2FQubrio-486C"
+              class="share-btn twitter"
+              target="_blank"
+              rel="noopener"
+            >
+              <i class="fab fa-twitter"></i> Share on X (Twitter)
+            </a>
+            <a
+              id="share-linkedin"
+              href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fanonymous.4open.science%2Fr%2FQubrio-486C"
+              class="share-btn linkedin"
+              target="_blank"
+              rel="noopener"
+            >
+              <i class="fab fa-linkedin"></i> Share on LinkedIn
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- BibTeX Section -->
+      <section id="bibtex" class="content-section bg-light">
+        <div class="container">
+          <h2 class="section-title">BibTeX</h2>
+          <div class="bibtex-container">
+            <button class="copy-button" onclick="copyBibtex()">
+              <i class="fas fa-copy"></i> Copy
+            </button>
+            <pre><code>@inproceedings{qubrio2026,
+  title     = {Qubrio: High-Performance Quantum Compilation via Multi-Agent LLM Collaboration},
+  author    = {Anonymous Authors},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2026},
+  note      = {Under double-blind review.
+                Anonymous repo: https://anonymous.4open.science/r/Qubrio-486C}
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="container">
+          <p class="footer-note">
+            This website uses a project-page template inspired by
+            <a href="https://nerfies.github.io/" target="_blank" rel="noopener">Nerfies</a>
+            and
+            <a href="https://mathvista.github.io/" target="_blank" rel="noopener">MathVista</a>,
+            licensed under a
+            <a
+              href="https://creativecommons.org/licenses/by-sa/4.0/"
+              target="_blank"
+              rel="noopener"
+              >Creative Commons Attribution-ShareAlike 4.0 International
+              License</a
+            >.
+          </p>
+          <p class="footer-note" style="margin-top: 12px">
+            <strong>Note.</strong> This is an anonymous submission for NeurIPS
+            2026. Author and institutional information will be made public upon
+            paper acceptance.
+          </p>
+        </div>
+      </footer>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

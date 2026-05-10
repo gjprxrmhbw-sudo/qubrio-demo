@@ -145,34 +145,3 @@
 
     window.addEventListener('resize', updateTOCVisibility);
 })();
-
-// ---- BibTeX copy (called inline from the Copy button) ----
-function copyBibtex() {
-    const bibtexText = `@inproceedings{qubrio2026,
-  title     = {Qubrio: High-Performance Quantum Compilation via Multi-Agent LLM Collaboration},
-  author    = {Anonymous Authors},
-  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
-  year      = {2026},
-  note      = {Under double-blind review.
-                Anonymous repo: https://anonymous.4open.science/r/Qubrio-486C}
-}`;
-
-    navigator.clipboard
-        .writeText(bibtexText)
-        .then(() => {
-            const copyButton = document.querySelector('.copy-button');
-            if (!copyButton) return;
-            const originalHTML = copyButton.innerHTML;
-
-            copyButton.innerHTML = '<i class="fas fa-check"></i> Copied!';
-            copyButton.style.background = 'rgba(46, 204, 113, 0.3)';
-
-            setTimeout(() => {
-                copyButton.innerHTML = originalHTML;
-                copyButton.style.background = 'rgba(255, 255, 255, 0.08)';
-            }, 2000);
-        })
-        .catch((err) => {
-            console.error('Failed to copy BibTeX:', err);
-        });
-}
